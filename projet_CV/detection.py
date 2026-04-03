@@ -1,23 +1,10 @@
-"""
-SafeSwim - Module de Détection Humaine
-Rôle 2 : Ingénieur Vision
-Auteur  : [Ton Nom]
-
-Stratégie :
-  - HOG + SVM (plus robuste que Haar en contexte piscine)
-  - Kalman Filter pour prédire la position quand le nageur disparaît
-  - Memory-efficient : on ne stocke que les N derniers centroides
-"""
-
 import cv2
 import numpy as np
 from dataclasses import dataclass, field
 from typing import Optional
 
 
-# ─────────────────────────────────────────────
-# Structures de données
-# ─────────────────────────────────────────────
+# Structures de données jhlkk
 
 @dataclass
 class Detection:
@@ -59,9 +46,7 @@ class TrackedPerson:
         return (cx, cy)
 
 
-# ─────────────────────────────────────────────
 # Détecteur HOG
-# ─────────────────────────────────────────────
 
 class HumanDetector:
     """
@@ -140,9 +125,7 @@ class HumanDetector:
         return rects[keep]
 
 
-# ─────────────────────────────────────────────
 # Filtre de Kalman — prédit la position perdue
-# ─────────────────────────────────────────────
 
 class KalmanTracker:
     """
@@ -206,9 +189,7 @@ class KalmanTracker:
         return self._initialized
 
 
-# ─────────────────────────────────────────────
 # Manager de Tracking — orchestre tout
-# ─────────────────────────────────────────────
 
 class TrackingManager:
     """
