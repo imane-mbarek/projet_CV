@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 3
+names: ['Drowning', 'Swimming', 'out of water']
+
+roboflow:
+  workspace: alanoud
+  project: swimming-and-drowning-1jtbi
+  version: 4
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/alanoud/swimming-and-drowning-1jtbi/dataset/4
