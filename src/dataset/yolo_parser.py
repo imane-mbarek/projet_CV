@@ -1,185 +1,119 @@
 """
 yolo_parser.py
---------------
-Parses YOLO-format .txt annotation files and converts normalised
-coordinates into pixel bounding boxes.
+==============
+Parses YOLO-format .txt annotation files into BoundingBox objects.
 
-YOLO format (one line per object):
+YOLO format per line:
     class_id  x_center  y_center  width  height
-All values are normalised to [0, 1] relative to image dimensions.
-
-This module is pure data — it does NOT read images.
+    (all coordinates normalized 0.0 → 1.0)
 """
 
-from __future__ import annotations
-
+import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional, Tuple
 
+logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Data structures
-# ---------------------------------------------------------------------------
 
 @dataclass
 class BoundingBox:
     """
-    A single annotation converted to absolute pixel coordinates.
+    One annotated object from a YOLO label file.
 
-    Attributes
-    ----------
-    class_id : original YOLO class index
-    x1, y1   : top-left corner (pixels, clamped to image bounds)
-    x2, y2   : bottom-right corner (pixels, clamped to image bounds)
+    class_id meanings (this dataset):
+        0 = Drowning
+        1 = Person out of water
+        2 = Swimming
     """
     class_id: int
-    x1: int
-    y1: int
-    x2: int
-    y2: int
+    x_center: float
+    y_center: float
+    width: float
+    height: float
 
-    @property
-    def width(self) -> int:
-        return self.x2 - self.x1
+    def to_pixel_coords(self, img_width: int, img_height: int) -> Tuple[int, int, int, int]:
+        """
+        Convert normalized YOLO coords → absolute pixel (x1, y1, x2, y2).
 
-    @property
-    def height(self) -> int:
-        return self.y2 - self.y1
+        YOLO stores center + size.
+        We need top-left + bottom-right for numpy slicing: img[y1:y2, x1:x2]
+        """
+        cx = self.x_center * img_width
+        cy = self.y_center * img_height
+        w  = self.width    * img_width
+        h  = self.height   * img_height
 
-    @property
-    def area(self) -> int:
-        return self.width * self.height
+        x1 = max(0,          int(cx - w / 2))
+        y1 = max(0,          int(cy - h / 2))
+        x2 = min(img_width,  int(cx + w / 2))
+        y2 = min(img_height, int(cy + h / 2))
 
-    def is_valid(self, min_size: int = 1) -> bool:
-        """Return True if the box has positive area above the minimum threshold."""
-        return self.width >= min_size and self.height >= min_size
+        return x1, y1, x2, y2
 
-
-@dataclass
-class ParseResult:
-    """
-    Result of parsing one label file.
-
-    Attributes
-    ----------
-    path         : Path to the .txt file that was parsed
-    boxes        : list of successfully parsed BoundingBox objects
-    skipped_lines: raw lines that could not be parsed (for diagnostics)
-    error        : set to an error message if the file could not be opened
-    """
-    path: Path
-    boxes: list[BoundingBox]
-    skipped_lines: list[str]
-    error: Optional[str] = None
-
-    @property
-    def ok(self) -> bool:
-        return self.error is None
-
-
-# ---------------------------------------------------------------------------
-# Core parser
-# ---------------------------------------------------------------------------
-
-def parse_label_file(
-    label_path: str | Path,
-    image_width: int,
-    image_height: int,
-    min_box_size: int = 1,
-) -> ParseResult:
-    """
-    Parse a single YOLO .txt label file.
-
-    Parameters
-    ----------
-    label_path   : path to the .txt annotation file
-    image_width  : pixel width of the corresponding image
-    image_height : pixel height of the corresponding image
-    min_box_size : boxes smaller than this (in pixels, both axes) are skipped
-
-    Returns
-    -------
-    ParseResult with all valid BoundingBox objects and any skipped lines.
-    """
-    label_path = Path(label_path)
-    boxes: list[BoundingBox] = []
-    skipped: list[str] = []
-
-    # ---- Try to open the file ----
-    try:
-        raw_text = label_path.read_text(encoding="utf-8", errors="replace")
-    except OSError as exc:
-        return ParseResult(
-            path=label_path, boxes=[], skipped_lines=[],
-            error=f"Cannot open file: {exc}"
+    def is_valid(self) -> bool:
+        return (
+            0.0 <= self.x_center <= 1.0
+            and 0.0 <= self.y_center <= 1.0
+            and 0.0 < self.width  <= 1.0
+            and 0.0 < self.height <= 1.0
         )
 
-    # ---- Parse line by line ----
-    for line in raw_text.splitlines():
-        line = line.strip()
-        if not line:
-            continue  # blank lines are fine
 
-        parts = line.split()
+class YoloParser:
+    """
+    Reads YOLO .txt label files and returns lists of BoundingBox objects.
+    Skips malformed lines with a warning instead of crashing.
+    """
 
-        # A valid YOLO line has exactly 5 fields
-        if len(parts) != 5:
-            skipped.append(line)
-            continue
+    def parse(self, label_path: str | Path) -> List[BoundingBox]:
+        """Parse a single label file. Returns [] if missing or unreadable."""
+        label_path = Path(label_path)
+        boxes: List[BoundingBox] = []
+
+        if not label_path.exists():
+            logger.debug(f"No label file: {label_path.name}")
+            return boxes
 
         try:
-            class_id = int(parts[0])
-            xc_norm  = float(parts[1])
-            yc_norm  = float(parts[2])
-            w_norm   = float(parts[3])
-            h_norm   = float(parts[4])
-        except ValueError:
-            skipped.append(line)
-            continue
+            lines = label_path.read_text().splitlines()
+        except OSError as e:
+            logger.warning(f"Cannot read {label_path}: {e}")
+            return boxes
 
-        # ---- Validate normalised values ----
-        if not (0.0 <= xc_norm <= 1.0 and 0.0 <= yc_norm <= 1.0
-                and 0.0 < w_norm <= 1.0 and 0.0 < h_norm <= 1.0):
-            skipped.append(line)
-            continue
+        for i, line in enumerate(lines, 1):
+            box = self._parse_line(line.strip(), label_path, i)
+            if box is not None:
+                boxes.append(box)
 
-        # ---- Convert to pixel coordinates ----
-        xc = xc_norm * image_width
-        yc = yc_norm * image_height
-        w  = w_norm  * image_width
-        h  = h_norm  * image_height
+        return boxes
 
-        x1 = int(xc - w / 2)
-        y1 = int(yc - h / 2)
-        x2 = int(xc + w / 2)
-        y2 = int(yc + h / 2)
+    def parse_for_image(self, image_path: str | Path, labels_dir: str | Path) -> List[BoundingBox]:
+        """Find and parse the label file for a given image path."""
+        label_path = Path(labels_dir) / (Path(image_path).stem + ".txt")
+        return self.parse(label_path)
 
-        # ---- Clamp to image bounds ----
-        x1 = max(0, x1)
-        y1 = max(0, y1)
-        x2 = min(image_width,  x2)
-        y2 = min(image_height, y2)
+    def _parse_line(self, line: str, src: Path, line_num: int) -> Optional[BoundingBox]:
+        if not line:
+            return None
+        parts = line.split()
+        if len(parts) != 5:
+            logger.warning(f"{src.name}:{line_num} — expected 5 fields, got {len(parts)}")
+            return None
+        try:
+            box = BoundingBox(
+                class_id=int(parts[0]),
+                x_center=float(parts[1]),
+                y_center=float(parts[2]),
+                width=float(parts[3]),
+                height=float(parts[4]),
+            )
+        except ValueError as e:
+            logger.warning(f"{src.name}:{line_num} — parse error: {e}")
+            return None
 
-        box = BoundingBox(class_id=class_id, x1=x1, y1=y1, x2=x2, y2=y2)
+        if not box.is_valid():
+            logger.warning(f"{src.name}:{line_num} — invalid coords: {box}")
+            return None
 
-        if not box.is_valid(min_size=min_box_size):
-            skipped.append(line)
-            continue
-
-        boxes.append(box)
-
-    return ParseResult(path=label_path, boxes=boxes, skipped_lines=skipped)
-
-
-# ---------------------------------------------------------------------------
-# Utility: find matching label for an image
-# ---------------------------------------------------------------------------
-
-def find_label_for_image(image_path: Path, labels_dir: Path) -> Optional[Path]:
-    """
-    Return the .txt label path whose stem matches the image stem,
-    or None if no matching label exists.
-    """
-    candidate = labels_dir / (image_path.stem + ".txt")
-    return candidate if candidate.exists() else None
+        return box
