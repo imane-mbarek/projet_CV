@@ -1,26 +1,3 @@
-"""
-main.py  — SafeSwim Rôle 2
-==========================
-Pipeline complet qui s'intègre avec le Rôle 1 (preprocessing.py).
-
-Usage :
-    python src/main.py --video data/test_video.mp4
-    python src/main.py --video data/test_video.mp4 --width 960
-    python src/main.py --video data/test_video.mp4 --output out.mp4
-
-Touches :
-    q      → quitter
-    Espace → pause/reprendre
-
-Architecture :
-    FramePreprocessor (Rôle 1)
-        ↓ clean_frame, gray_frame
-    HumanDetector (Rôle 2)
-        ↓ detections
-    TrackingManager (Rôle 2)
-        ↓ tracked_persons
-    Rôle 3 → classification.py (à venir)
-"""
 
 from __future__ import annotations
 
@@ -36,8 +13,8 @@ import numpy as np
 # Ce fichier est dans src/, les modules aussi
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from preprocessing.preprocessing import FramePreprocessor        # Rôle 1
-from detection.detection     import HumanDetector, TrackingManager, TrackedPerson
+from preprocessing.preprocessing import FramePreprocessor
+from detection.detection  import HumanDetector, TrackingManager, TrackedPerson
 
 
 # ─────────────────────────────────────────────
@@ -77,8 +54,14 @@ def draw_person(frame: np.ndarray, person: TrackedPerson) -> None:
     color = get_color(person.person_id)
     cx, cy = person.centroid
 
-    cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
-    label = f"ID {person.person_id}"
+    # Boîte englobante
+    if person.is_predicted:
+        # Pointillés bleus si nageur sous l'eau
+        _dashed_rect(frame, (x, y), (x+w, y+h), (60, 60, 255))
+        label = f"ID {person.person_id} [sous l'eau]"
+    else:
+        cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
+        label = f"ID {person.person_id}"
 
     # Label avec fond
     (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
@@ -107,10 +90,11 @@ def draw_hud(frame: np.ndarray, persons: list[TrackedPerson], fps: float) -> Non
     """Panneau d'information en haut à gauche."""
     lines = [
         f"FPS     : {fps:.1f}",
-        f"Personnes : {len(persons)}",
+        f"Nageurs : {len(persons)}",
     ]
     for p in persons:
-        lines.append(f"  ID{p.person_id}: {p.speed_px:.1f}px/f")
+        state = f"PERDU({p.frames_lost}f)" if p.is_predicted else "OK"
+        lines.append(f"  ID{p.person_id}: {state} | {p.speed_px:.1f}px/f")
 
     for i, line in enumerate(lines):
         y = 24 + i * 20
@@ -118,6 +102,24 @@ def draw_hud(frame: np.ndarray, persons: list[TrackedPerson], fps: float) -> Non
                     cv2.FONT_HERSHEY_SIMPLEX, 0.55, (0, 0, 0), 3, cv2.LINE_AA)
         cv2.putText(frame, line, (10, y),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.55, (255, 255, 255), 1, cv2.LINE_AA)
+
+
+def draw_alert(frame: np.ndarray, persons: list[TrackedPerson]) -> None:
+    """
+    Pré-alerte visuelle — sera remplacée par la logique du Rôle 3.
+    Condition simple : nageur sous l'eau depuis plus de 45 frames.
+    """
+    for p in persons:
+        if p.frames_lost > 45:
+            h, w = frame.shape[:2]
+            cv2.rectangle(frame, (0, 0), (w, h), (0, 0, 255), 8)
+            cv2.putText(
+                frame,
+                f"ALERTE — ID{p.person_id} sous l'eau ({p.frames_lost}f)",
+                (w // 2 - 280, h - 20),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 0, 255), 3, cv2.LINE_AA
+            )
+            break
 
 
 def _dashed_rect(frame, pt1, pt2, color, thickness=2, dash=10):
@@ -196,7 +198,7 @@ def main() -> None:
             clean_frame, gray_frame = preprocessor.get_clean_frame(frame)
 
             # ── Rôle 2 : Détection ───────────
-            detections = detector.detect(clean_frame)
+            detections = detector.detect(gray_frame)
 
             # ── Rôle 2 : Tracking ────────────
             tracked_persons = tracker.update(detections)
@@ -221,6 +223,7 @@ def main() -> None:
                 fps_n = 0
 
             draw_hud(display, tracked_persons, fps)
+            draw_alert(display, tracked_persons)
 
             if writer:
                 writer.write(display)
