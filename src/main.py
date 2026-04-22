@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from preprocessing.preprocessing import FramePreprocessor        # Rôle 1
 from detection.detection     import HumanDetector, TrackingManager, TrackedPerson
+from classification.classification import BehaviorClassifier, draw_alerte
 
 
 # ─────────────────────────────────────────────
@@ -121,7 +122,8 @@ def main() -> None:
     # ── Modules ─────────────────────────────
     preprocessor = FramePreprocessor()      # Rôle 1
     detector     = HumanDetector()          # Rôle 2 — détection
-    tracker      = TrackingManager()        # Rôle 2 — tracking
+    tracker      = TrackingManager()  # Rôle 2 — tracking
+    classifier   = BehaviorClassifier()    # Rôle 3 — classification
 
     # ── Vidéo ────────────────────────────────
     cap = cv2.VideoCapture(args.video)
@@ -166,6 +168,13 @@ def main() -> None:
 
             # ── Rôle 2 : Tracking ────────────
             tracked_persons = tracker.update(detections)
+
+            # ── Rôle 3 : Classification ──────
+            for person in tracked_persons:
+                 cx, cy = person.centroid
+                 en_danger = classifier.update(person.person_id, cx, cy)
+                 if en_danger:
+                      draw_alerte(display, person.person_id)
 
             # ── Affichage ────────────────────
             display = cv2.resize(
