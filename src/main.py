@@ -1,26 +1,3 @@
-"""
-main.py  — SafeSwim Rôle 2
-==========================
-Pipeline complet qui s'intègre avec le Rôle 1 (preprocessing.py).
-
-Usage :
-    python src/main.py --video data/test_video.mp4
-    python src/main.py --video data/test_video.mp4 --width 960
-    python src/main.py --video data/test_video.mp4 --output out.mp4
-
-Touches :
-    q      → quitter
-    Espace → pause/reprendre
-
-Architecture :
-    FramePreprocessor (Rôle 1)
-        ↓ clean_frame, gray_frame
-    HumanDetector (Rôle 2)
-        ↓ detections
-    TrackingManager (Rôle 2)
-        ↓ tracked_persons
-    Rôle 3 → classification.py (à venir)
-"""
 
 from __future__ import annotations
 
@@ -72,10 +49,9 @@ def get_color(pid: int) -> tuple:
 
 
 def draw_person(frame: np.ndarray, person: TrackedPerson) -> None:
-    """Dessine la bbox, le centroïde, la trace et la vitesse."""
+    """Dessine la bbox et la vitesse."""
     x, y, w, h = person.bbox
     color = get_color(person.person_id)
-    cx, cy = person.centroid
 
     cv2.rectangle(frame, (x, y), (x+w, y+h), color, 2)
     label = f"ID {person.person_id}"
@@ -91,16 +67,6 @@ def draw_person(frame: np.ndarray, person: TrackedPerson) -> None:
         cv2.putText(frame, f"{person.speed_px:.1f} px/f",
                     (x, y + h + 16),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.42, color, 1, cv2.LINE_AA)
-
-    # Centroïde
-    cv2.circle(frame, (cx, cy), 4, color, -1)
-
-    # Trace de mouvement
-    pts = person.centroid_history
-    for i in range(1, len(pts)):
-        alpha = i / len(pts)
-        c = tuple(int(v * alpha) for v in color)
-        cv2.line(frame, pts[i-1], pts[i], c, 2)
 
 
 def draw_hud(frame: np.ndarray, persons: list[TrackedPerson], fps: float) -> None:

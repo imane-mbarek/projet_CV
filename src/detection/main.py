@@ -87,15 +87,6 @@ def draw_person(frame: np.ndarray, person: TrackedPerson) -> None:
         cv2.putText(frame, f"{person.speed_px:.1f}px/f",
                     (x, y+h+16), FONT, 0.42, get_color(person.person_id), 1)
 
-    cv2.circle(frame, (cx, cy), 4, color, -1)
-
-    pts = person.centroid_history
-    for i in range(1, len(pts)):
-        alpha = i / len(pts)
-        c = tuple(int(v * alpha) for v in color)
-        cv2.line(frame, pts[i-1], pts[i], c, 2)
-
-
 def draw_red_line(frame: np.ndarray, red_line_y: int) -> None:
     w = frame.shape[1]
     cv2.line(frame, (0, red_line_y), (w, red_line_y), ALERT_COLOR, 2)
