@@ -176,35 +176,21 @@ class DatasetBuilder:
 
     def _standardize(self, crop: np.ndarray) -> Optional[np.ndarray]:
         """
-        Mirrors FramePreprocessor.get_clean_frame() exactly — same order,
-        same parameters. Consistency between training data and inference
-        is critical: if the model is trained on blurred-then-gray crops
-        but sees sharp-then-gray frames at inference, accuracy drops.
-
-        Pipeline (matching preprocessing.py):
-            Step 1 — Resize to target dimensions
-            Step 2 — GaussianBlur(5, 5) noise reduction (same as video frames)
-            Step 3 — Convert to grayscale
+        1. Grayscale (if enabled)
+        2. Resize to target dimensions
 
         Interpolation:
             INTER_AREA   → best for downscaling (anti-aliasing)
             INTER_LINEAR → best for upscaling
         """
         try:
-            # Step 1 — Resize
-            h, w = crop.shape[:2]
-            tw, th = self.output_size
-            interp = cv2.INTER_AREA if (w > tw or h > th) else cv2.INTER_LINEAR
-            crop = cv2.resize(crop, (tw, th), interpolation=interp)
-
-            # Step 2 — Gaussian blur (matches FramePreprocessor kernel (5,5) sigma=0)
-            crop = cv2.GaussianBlur(crop, (5, 5), 0)
-
-            # Step 3 — Grayscale
             if self.grayscale and len(crop.shape) == 3:
                 crop = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
 
-            return crop
+            h, w = crop.shape[:2]
+            tw, th = self.output_size
+            interp = cv2.INTER_AREA if (w > tw or h > th) else cv2.INTER_LINEAR
+            return cv2.resize(crop, (tw, th), interpolation=interp)
 
         except cv2.error as e:
             logger.warning(f"Standardization error: {e}")
