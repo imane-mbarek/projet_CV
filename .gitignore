@@ -4,3 +4,7 @@ venv/
 .venv/
 *.pyo
 *.pyd
+data/raw/ 
+data/processed/ 
+fix_encoding.py 
+data/dataset_raw/ 
