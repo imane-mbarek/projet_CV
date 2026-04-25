@@ -137,7 +137,7 @@ def validate_dataset(processed_root: str | Path) -> ValidationReport:
 
     Parameters
     ----------
-    processed_root : path to data/dataset_processed/
+    processed_root : path to data/processed/
 
     Returns
     -------

@@ -7,7 +7,7 @@ Usage
 -----
 From the project root:
     python -m scripts.build_dataset
-    python -m scripts.build_dataset --raw data/dataset_raw --out data/dataset_processed
+    python -m scripts.build_dataset --raw data --out data/processed
 
 The script:
   1. Analyzes the raw dataset structure.
@@ -34,14 +34,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--raw",
         type=str,
-        default="data/dataset_raw",
-        help="Path to the raw YOLO dataset root. Default: data/dataset_raw",
+        default="data",
+        help="Path to the raw YOLO dataset root. Default: data",
     )
     parser.add_argument(
         "--out",
         type=str,
-        default="data/dataset_processed",
-        help="Path to write the processed dataset. Default: data/dataset_processed",
+        default="data/processed",
+        help="Path to write the processed dataset. Default: data/processed",
     )
     parser.add_argument(
         "--quiet",
@@ -65,7 +65,7 @@ def main() -> None:
     # ---- Abort if raw root does not exist ----
     if not raw_root.exists():
         print(f"[ERROR] Raw dataset root not found: {raw_root}")
-        print("        Make sure your dataset is at data/dataset_raw/")
+        print("        Make sure your dataset is under data/")
         sys.exit(1)
 
     # ---- Step 2: Build processed dataset ----

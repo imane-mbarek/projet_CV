@@ -44,7 +44,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--processed",
-        default="data/dataset_processed",
+        default="data/processed",
         help="Path to the processed dataset root.",
     )
     parser.add_argument(
