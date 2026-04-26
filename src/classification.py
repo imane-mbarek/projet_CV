@@ -3,8 +3,12 @@ import cv2, pickle
 import numpy as np
 from skimage.feature import hog
 
+# Charger le modèle
 with open("models/drowning_model.pkl", "rb") as f:
-    MODEL = pickle.load(f)
+    data = pickle.load(f)
+
+MODEL  = data["model"]
+SCALER = data["scaler"]  # None pour Random Forest
 
 IMG_SIZE   = (64, 128)
 HOG_PARAMS = {
@@ -19,7 +23,6 @@ SEUIL_CONFIRMATION   = 8
 def preprocess(crop: np.ndarray) -> np.ndarray:
     """Identique au preprocessing de Personne 1 — NE PAS MODIFIER."""
     img = cv2.resize(crop, IMG_SIZE)
-    img = cv2.GaussianBlur(img, (5, 5), 0)
     if len(img.shape) == 3:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return img
@@ -28,16 +31,24 @@ def classify(person, frame: np.ndarray) -> dict:
     pid = person.person_id
     x, y, w, h = person.bbox
 
+    # Étape 1 — Extraire le crop
     crop = frame[y:y+h, x:x+w]
     if crop.size == 0:
         return {"person_id": pid, "status": "OK", "proba": 0.0}
 
+    # Étape 2 — Preprocessing + HOG
     img      = preprocess(crop)
     features = hog(img, **HOG_PARAMS)
-    proba    = MODEL.predict_proba([features])[0][1]
 
+    # Étape 3 — Normalisation si scaler existe
+    if SCALER is not None:
+        features = SCALER.transform([features])[0]
+
+    # Étape 4 — Prédiction
+    proba = MODEL.predict_proba([features])[0][1]
     score = proba
 
+    # Étape 5 — Enrichir avec signaux Personne 2
     if person.drowning_alert:
         score = min(1.0, score + 0.30)
     if person.legs_suspicious:
@@ -47,6 +58,7 @@ def classify(person, frame: np.ndarray) -> dict:
     if person.frames_lost > 60:
         score = min(1.0, score + 0.10)
 
+    # Étape 6 — Confirmation temporelle
     if score > 0.6:
         danger_counters[pid] = danger_counters.get(pid, 0) + 1
     else:
