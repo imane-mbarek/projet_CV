@@ -18,6 +18,7 @@ import argparse
 import os
 import sys
 import time
+from src.classification import classify
 
 import cv2
 import numpy as np
@@ -227,6 +228,22 @@ def main() -> None:
 
             # ── Rôle 2 : Tracking ─────────────
             persons = tracker.update(detections)
+            # ── Rôle 3 : Classification ────────
+            for person in persons:
+                result = classify(person, clean_frame)
+
+                x, y, w, h = person.bbox
+                couleur = (0, 0, 255) if result["status"] == "DANGER" else (0, 255, 0)
+                texte   = f"ID{result['person_id']} {result['status']} {result['proba']}%"
+
+                cv2.rectangle(clean_frame, (x, y), (x+w, y+h), couleur, 2)
+                cv2.putText(clean_frame, texte, (x, y - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, couleur, 2)
+
+                if result["status"] == "DANGER":
+                    cv2.putText(clean_frame, "!!! NOYADE DETECTEE !!!",
+                                (50, 50), cv2.FONT_HERSHEY_SIMPLEX,
+                                1.5, (0, 0, 255), 3)
 
             # ── Affichage ─────────────────────
             display = cv2.resize(clean_frame, (dw, dh),
