@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+<<<<<<< HEAD
 
 venv/
 .venv/
@@ -23,3 +24,10 @@ data/dataset_raw/
 .DS_Store
 
 fix_encoding.py
+=======
+data/raw/ 
+data/processed/ 
+fix_encoding.py 
+data/dataset_raw/ 
+models/ 
+>>>>>>> c21fad7b31dfab959e34268184f8e5d529c234ea

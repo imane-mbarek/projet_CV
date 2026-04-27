@@ -1,0 +1,34 @@
+2026-04-27 11:27:59,866 - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+2026-04-27 11:27:59,887 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2026-04-27 11:27:59,893 - INFO - [33mPress CTRL+C to quit[0m
+2026-04-27 11:28:14,871 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:14] "GET /api/status HTTP/1.1" 200 -
+2026-04-27 11:28:31,743 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:31] "GET /socket.io/?transport=polling&EIO=4&t=1777285711.742158 HTTP/1.1" 200 -
+2026-04-27 11:28:31,763 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:31] "POST /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE HTTP/1.1" 200 -
+2026-04-27 11:28:31,765 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:31] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285711.7438028 HTTP/1.1" 200 -
+2026-04-27 11:28:31,775 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:31] "POST /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE HTTP/1.1" 200 -
+2026-04-27 11:28:31,780 - INFO - Chargement YOLO : C:\Users\admin\Desktop\projet_CV\src\detection\yolov8n.pt
+2026-04-27 11:28:31,884 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:31] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285711.7699287 HTTP/1.1" 200 -
+2026-04-27 11:28:32,430 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:32] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285711.9115555 HTTP/1.1" 200 -
+2026-04-27 11:28:32,968 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:32] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285712.430593 HTTP/1.1" 200 -
+2026-04-27 11:28:33,410 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:33] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285712.9712193 HTTP/1.1" 200 -
+2026-04-27 11:28:33,822 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:33] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285713.41084 HTTP/1.1" 200 -
+2026-04-27 11:28:34,218 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:34] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285713.8308206 HTTP/1.1" 200 -
+2026-04-27 11:28:34,617 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:34] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285714.227883 HTTP/1.1" 200 -
+2026-04-27 11:28:35,031 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:35] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285714.6276782 HTTP/1.1" 200 -
+2026-04-27 11:28:35,502 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:35] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285715.0341215 HTTP/1.1" 200 -
+2026-04-27 11:28:35,968 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:35] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285715.5139787 HTTP/1.1" 200 -
+2026-04-27 11:28:36,438 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:36] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285715.9796019 HTTP/1.1" 200 -
+2026-04-27 11:28:36,866 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:36] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285716.4411972 HTTP/1.1" 200 -
+2026-04-27 11:28:37,302 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:37] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285716.8680701 HTTP/1.1" 200 -
+2026-04-27 11:28:37,767 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:37] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285717.3042018 HTTP/1.1" 200 -
+2026-04-27 11:28:38,166 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:38] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285717.769114 HTTP/1.1" 200 -
+2026-04-27 11:28:38,596 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:38] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285718.1823826 HTTP/1.1" 200 -
+2026-04-27 11:28:39,023 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:39] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285718.5963361 HTTP/1.1" 200 -
+2026-04-27 11:28:39,410 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:39] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285719.0317464 HTTP/1.1" 200 -
+2026-04-27 11:28:39,811 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:39] "POST /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE HTTP/1.1" 200 -
+2026-04-27 11:28:39,834 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:39] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285719.410642 HTTP/1.1" 200 -
+2026-04-27 11:28:39,888 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:39] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285719.8341477 HTTP/1.1" 200 -
+2026-04-27 11:28:40,300 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:40] "POST /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE HTTP/1.1" 200 -
+2026-04-27 11:28:40,300 - INFO - 127.0.0.1 - - [27/Apr/2026 11:28:40] "GET /socket.io/?transport=polling&EIO=4&sid=HhBOriVeLi-DOGwSAAAE&t=1777285719.902831 HTTP/1.1" 200 -
+2026-04-27 11:29:45,756 - INFO - Chargement YOLO : C:\Users\admin\Desktop\projet_CV\src\detection\yolov8n.pt
