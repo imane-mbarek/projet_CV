@@ -1,0 +1,20 @@
+C:\Users\admin\Desktop\projet_CV\backend\server.py:4: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+framework.  For more detail see
+https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
+
+  import eventlet
+Traceback (most recent call last):
+  File "C:\Users\admin\Desktop\projet_CV\backend\server.py", line 206, in <module>
+    socketio.run(app, host="0.0.0.0", port=args.port, debug=False)
+  File "C:\Users\admin\Desktop\projet_CV\venv\Lib\site-packages\flask_socketio\__init__.py", line 708, in run
+    run_server()
+  File "C:\Users\admin\Desktop\projet_CV\venv\Lib\site-packages\flask_socketio\__init__.py", line 685, in run_server
+    eventlet_socket = eventlet.listen(addresses[0][4],
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\admin\Desktop\projet_CV\venv\Lib\site-packages\eventlet\convenience.py", line 78, in listen
+    sock.bind(addr)
+OSError: [WinError 10048] Only one usage of each socket address (protocol/network address/port) is normally permitted

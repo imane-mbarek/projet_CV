@@ -1,10 +1,33 @@
 __pycache__/
 *.pyc
-venv/
-.venv/
 *.pyo
 *.pyd
+<<<<<<< HEAD
+
+venv/
+.venv/
+
+node_modules/
+dist/
+
+.env
+
+data/raw/
+data/processed/
+data/dataset_raw/
+
+*.pt
+*.onnx
+*.mp4
+*.avi
+
+.DS_Store
+
+fix_encoding.py
+=======
 data/raw/ 
 data/processed/ 
 fix_encoding.py 
 data/dataset_raw/ 
+models/ 
+>>>>>>> c21fad7b31dfab959e34268184f8e5d529c234ea

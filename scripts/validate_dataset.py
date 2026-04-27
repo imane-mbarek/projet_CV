@@ -9,7 +9,7 @@ Usage
 -----
 From the project root:
     python -m scripts.validate_dataset
-    python -m scripts.validate_dataset --processed data/dataset_processed
+    python -m scripts.validate_dataset --processed data/processed
     python -m scripts.validate_dataset --fail-on-warnings
 
 Exit codes
@@ -35,8 +35,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--processed",
         type=str,
-        default="data/dataset_processed",
-        help="Path to the processed dataset root. Default: data/dataset_processed",
+        default="data/processed",
+        help="Path to the processed dataset root. Default: data/processed",
     )
     parser.add_argument(
         "--fail-on-warnings",
